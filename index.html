@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Quiz App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f0f2f5; /* A slightly different, cleaner background */
+        }
+        /* Neumorphism Styles */
+        .neumorphic {
+            background: #e0e5ec;
+            border-radius: 20px;
+            box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
+        }
+        .neumorphic-inset {
+            background: #e0e5ec;
+            border-radius: 20px;
+            box-shadow: inset 9px 9px 16px #a3b1c6, inset -9px -9px 16px #ffffff;
+        }
+        .neumorphic-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .neumorphic-button:hover {
+            box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
+        }
+        .neumorphic-button:active, .neumorphic-button.active {
+            box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff;
+            font-size: 0.98rem;
+        }
+        /* Screen Transitions */
+        .screen { display: none; }
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .timer-bar-inner {
+            background: linear-gradient(90deg, #6dd5ed, #2193b0);
+            transition: width 1s linear;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e0e5ec; }
+        ::-webkit-scrollbar-thumb { background: #a3b1c6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8e9aaa; }
+        /* Message Box */
+        #message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        #message-box.show { opacity: 1; visibility: visible; }
+    </style>
+</head>
+<body class="bg-[#f0f2f5] flex items-center justify-center min-h-screen p-4 md:p-6">
+
+    <!-- Custom Message Box -->
+    <div id="message-box" class="neumorphic bg-red-500"></div>
+    
+    <!-- Changed max-w-lg to max-w-5xl for a wider layout -->
+    <div id="app-container" class="w-full max-w-5xl mx-auto">
+        
+        <!-- Landing Screen (Your new design integrated) -->
+        <div id="landing-screen" class="screen">
+             <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+                <header class="flex justify-between items-center mb-10 md:mb-16">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center shadow">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                        </div>
+                        <span class="text-xl font-bold text-gray-800">QuizUp</span>
+                    </div>
+                    <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-500">
+                        <a href="#" class="hover:text-blue-500 transition-colors">Home</a>
+                        <a href="#" onclick="showDashboard()" class="hover:text-blue-500 transition-colors">Dashboard</a>
+                        <a href="#" class="hover:text-blue-500 transition-colors">About</a>
+                        <a href="#" class="hover:text-blue-500 transition-colors">Contact</a>
+                    </nav>
+                </header>
+        
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+                    <div class="text-center md:text-left">
+                        <h1 class="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight">
+                            Quiz Performance System
+                        </h1>
+                        <p class="mt-4 text-gray-600 max-w-md mx-auto md:mx-0">
+                           A transparent and auditable system to evaluate and reward your knowledge.
+                        </p>
+                        <button onclick="showScreen('login-screen')" class="mt-8 px-10 py-3 bg-blue-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition-colors text-base">
+                            Get Started
+                        </button>
+                        <div class="mt-12">
+                            <h3 class="font-bold text-gray-800">How it works</h3>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Understand the logic behind your knowledge data sources.
+                            </p>
+                        </div>
+                    </div>
+        
+                    <div class="w-full max-w-sm mx-auto">
+                        <div class="relative flex justify-center mb-4">
+                            <svg width="250" height="125" viewBox="0 0 250 125">
+                                 <defs>
+                                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#ef4444" />
+                                        <stop offset="50%" stop-color="#f59e0b" />
+                                        <stop offset="100%" stop-color="#22c55e" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M 25 115 A 100 100 0 0 1 225 115" fill="none" stroke="#e5e7eb" stroke-width="22" stroke-linecap="round" shape-rendering="geometricPrecision"/>
+                                <!-- stroke-dashoffset calculates the colored part. 314 is full circle. 314 * (1 - score/100) -->
+                                <path d="M 25 115 A 100 100 0 0 1 225 115" fill="none" stroke="url(#scoreGradient)" stroke-width="22" stroke-linecap="round"
+                                    stroke-dasharray="314" stroke-dashoffset="87" shape-rendering="geometricPrecision"/>
+                            </svg>
+                            <div class="absolute bottom-[-10px] text-center">
+                                <span class="text-5xl font-extrabold text-gray-800">72.3</span>
+                                <span class="text-lg font-medium text-gray-500">/100</span>
+                            </div>
+                        </div>
+                        <p class="text-center font-semibold text-gray-700 mb-6 text-lg">Your Score</p>
+                        
+                        <div>
+                            <h3 class="font-bold text-gray-800 mb-4 text-center md:text-left">Score Breakdown</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="p-2">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-medium text-gray-600">Reasoning</span>
+                                        <span class="font-bold text-gray-800">24</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
+                                    </div>
+                                </div>
+                                 <div class="p-2">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-medium text-gray-600">Quantitative</span>
+                                        <span class="font-bold text-gray-800">21.25</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                 <div class="p-2">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-medium text-gray-600">History</span>
+                                        <span class="font-bold text-gray-800">10</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-sky-400 h-2 rounded-full" style="width: 50%"></div>
+                                    </div>
+                                </div>
+                                 <div class="p-2">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-medium text-gray-600">G.K.</span>
+                                        <span class="font-bold text-gray-800">17.3</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-orange-400 h-2 rounded-full" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- The rest of the app screens will be contained in the now wider app-container -->
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen max-w-md mx-auto">
+            <div class="neumorphic p-8 text-center">
+                <h1 class="text-3xl font-bold text-gray-700 mb-2">Welcome Back!</h1>
+                <p class="text-gray-500 mb-8">Sign in to continue your journey</p>
+                <div class="space-y-6">
+                    <input id="login-email" type="email" placeholder="Email" class="w-full p-4 neumorphic-inset text-gray-700 focus:outline-none rounded-xl">
+                    <input id="login-password" type="password" placeholder="Password" class="w-full p-4 neumorphic-inset text-gray-700 focus:outline-none rounded-xl">
+                </div>
+                <button onclick="handleLogin()" class="w-full mt-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl neumorphic-button">
+                    LOGIN
+                </button>
+                <p class="text-gray-500 mt-6 text-sm">
+                    Don't have an account? <a href="#" onclick="showScreen('signup-screen')" class="font-semibold text-cyan-600">Sign Up</a>
+                </p>
+                 <p class="text-gray-500 mt-4 text-sm">
+                    <a href="#" onclick="showScreen('landing-screen')" class="font-semibold text-gray-500">← Back to Home</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Signup Screen -->
+        <div id="signup-screen" class="screen max-w-md mx-auto">
+            <div class="neumorphic p-8 text-center">
+                <h1 class="text-3xl font-bold text-gray-700 mb-2">Create Account</h1>
+                <p class="text-gray-500 mb-8">Let's get you started!</p>
+                <div class="space-y-6">
+                    <input id="signup-name" type="text" placeholder="Full Name" class="w-full p-4 neumorphic-inset text-gray-700 focus:outline-none rounded-xl">
+                    <input id="signup-email" type="email" placeholder="Email" class="w-full p-4 neumorphic-inset text-gray-700 focus:outline-none rounded-xl">
+                    <input id="signup-password" type="password" placeholder="Password" class="w-full p-4 neumorphic-inset text-gray-700 focus:outline-none rounded-xl">
+                </div>
+                <button onclick="handleSignup()" class="w-full mt-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl neumorphic-button">
+                    SIGN UP
+                </button>
+                <p class="text-gray-500 mt-6 text-sm">
+                    Already have an account? <a href="#" onclick="showScreen('login-screen')" class="font-semibold text-cyan-600">Login</a>
+                </p>
+                 <p class="text-gray-500 mt-4 text-sm">
+                    <a href="#" onclick="showScreen('landing-screen')" class="font-semibold text-gray-500">← Back to Home</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Category Selection Screen -->
+        <div id="category-screen" class="screen max-w-lg mx-auto">
+             <div class="neumorphic p-6">
+                <h2 class="text-2xl font-bold text-center text-gray-700 mb-1">Choose a Category</h2>
+                <p class="text-center text-gray-500 mb-6" id="welcome-message"></p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div onclick="startQuiz('Reasoning')" class="neumorphic neumorphic-button p-4 text-center cursor-pointer rounded-2xl">
+                        <div class="text-4xl mb-2">🧠</div><p class="font-semibold text-gray-600">Reasoning</p>
+                    </div>
+                    <div onclick="startQuiz('Quantitative Aptitude')" class="neumorphic neumorphic-button p-4 text-center cursor-pointer rounded-2xl">
+                        <div class="text-4xl mb-2">🧮</div><p class="font-semibold text-gray-600">Quantitative</p>
+                    </div>
+                    <div onclick="startQuiz('Relations')" class="neumorphic neumorphic-button p-4 text-center cursor-pointer rounded-2xl">
+                         <div class="text-4xl mb-2">🤝</div><p class="font-semibold text-gray-600">Relations</p>
+                    </div>
+                    <div onclick="startQuiz('General Knowledge')" class="neumorphic neumorphic-button p-4 text-center cursor-pointer rounded-2xl">
+                        <div class="text-4xl mb-2">🌍</div><p class="font-semibold text-gray-600">G.K.</p>
+                    </div>
+                     <div onclick="startQuiz('History')" class="neumorphic neumorphic-button p-4 text-center cursor-pointer rounded-2xl">
+                        <div class="text-4xl mb-2">📜</div><p class="font-semibold text-gray-600">History</p>
+                    </div>
+                </div>
+                 <button onclick="logout()" class="w-full mt-6 py-3 bg-gray-600 text-white font-bold rounded-xl neumorphic-button">Logout</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen max-w-lg mx-auto">
+            <div class="neumorphic p-6 space-y-6">
+                <div class="flex justify-between items-center">
+                    <div class="text-sm font-semibold text-gray-600">Question <span id="current-question">1</span>/<span id="total-questions">10</span></div>
+                    <div class="text-lg font-bold text-gray-700" id="quiz-category">Reasoning</div>
+                    <div class="text-sm font-semibold text-gray-600">Score: <span id="score">0</span></div>
+                </div>
+                <div class="w-full neumorphic-inset rounded-full h-3">
+                    <div id="timer-bar" class="timer-bar-inner h-full rounded-full" style="width: 100%;"></div>
+                </div>
+                <div class="neumorphic-inset p-6 rounded-2xl min-h-[120px] flex items-center justify-center">
+                    <p id="question-text" class="text-center text-lg font-medium text-gray-800"></p>
+                </div>
+                <div id="options-container" class="grid grid-cols-1 gap-4"></div>
+            </div>
+        </div>
+        
+        <!-- Leaderboard/Score Screen -->
+        <div id="leaderboard-screen" class="screen max-w-lg mx-auto">
+            <div class="neumorphic p-6 text-center">
+                <h1 id="leaderboard-title" class="text-3xl font-bold text-gray-700 mb-2">Quiz Complete!</h1>
+                <div id="final-score-container">
+                    <p class="text-gray-500 mb-4">Your Final Score is</p>
+                    <div class="w-32 h-32 neumorphic-inset rounded-full mx-auto flex items-center justify-center mb-6">
+                        <span id="final-score" class="text-4xl font-bold text-cyan-600">0</span>
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold text-gray-700 mb-4">Leaderboard</h2>
+                <div id="leaderboard-list" class="space-y-3 text-left max-h-60 overflow-y-auto pr-2"></div>
+                <div id="leaderboard-buttons" class="mt-8 space-y-3">
+                     <button onclick="showScreen('category-screen')" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl neumorphic-button">
+                        Play Again
+                    </button>
+                     <button onclick="showScreen('landing-screen')" class="w-full py-3 bg-gray-600 text-white font-bold rounded-xl neumorphic-button">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // NOTE: Make sure your server is running on http://localhost:3000
+        const API_URL = 'http://localhost:3000'; 
+        const screens = document.querySelectorAll('.screen');
+        
+        const mockQuestions = {
+            'Reasoning': [
+                { question: "Which number should come next: 1, 2, 4, 8, ...?", options: ["16", "12", "10", "14"], answer: "16" },
+                { question: "If 'CAT' is '3120', what is 'DOG'?", options: ["4157", "4158", "4156", "4155"], answer: "4157" },
+            ],
+            'Quantitative Aptitude': [ { question: "What is 25% of 200?", options: ["25", "50", "75", "100"], answer: "50" } ],
+            'Relations': [ { question: "A woman says, 'His mother is the only daughter of my mother.' How is she related to the man?", options: ["Mother", "Sister", "Aunt"], answer: "Mother" } ],
+            'General Knowledge': [ { question: "What is the capital of Japan?", options: ["Beijing", "Seoul", "Tokyo", "Bangkok"], answer: "Tokyo" } ],
+            'History': []
+        };
+        
+        let currentUser = null, currentQuestionIndex = 0, score = 0, timer, timeLeft = 15;
+
+        function showMessage(message, isError = true) {
+            const el = document.getElementById('message-box');
+            el.textContent = message;
+            el.style.backgroundColor = isError ? '#ef4444' : '#22c55e';
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function showScreen(screenId) {
+            screens.forEach(s => s.classList.toggle('active', s.id === screenId));
+        }
+        
+        async function handleSignup() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            try {
+                const res = await fetch(`${API_URL}/api/signup`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                currentUser = data;
+                document.getElementById('welcome-message').innerText = `Welcome, ${currentUser.name}!`;
+                showScreen('category-screen');
+            } catch (err) { showMessage(err.message); }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                const res = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                currentUser = data;
+                document.getElementById('welcome-message').innerText = `Welcome back, ${currentUser.name}!`;
+                showScreen('category-screen');
+            } catch (err) { showMessage(err.message); }
+        }
+
+        function logout() {
+            currentUser = null;
+            showScreen('login-screen');
+        }
+
+        function startQuiz(category) {
+            const questions = mockQuestions[category];
+            if (!questions || questions.length === 0) return showMessage("No questions for this category.");
+            window.quizData = questions;
+            currentQuestionIndex = score = 0;
+            document.getElementById('score').innerText = score;
+            document.getElementById('quiz-category').innerText = category;
+            document.getElementById('total-questions').innerText = questions.length;
+            showScreen('quiz-screen');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= window.quizData.length) return endQuiz();
+            const q = window.quizData[currentQuestionIndex];
+            document.getElementById('current-question').innerText = currentQuestionIndex + 1;
+            document.getElementById('question-text').innerText = q.question;
+            const opts = document.getElementById('options-container');
+            opts.innerHTML = q.options.map(o => `<button class="w-full p-4 neumorphic neumorphic-button text-gray-700 font-medium rounded-xl" onclick="selectAnswer(this, '${o.replace(/'/g, "\\'")}')">${o}</button>`).join('');
+            resetTimer();
+        }
+
+        function selectAnswer(btn, selected) {
+            clearInterval(timer);
+            document.querySelectorAll('#options-container button').forEach(b => b.disabled = true);
+            const correct = window.quizData[currentQuestionIndex].answer;
+            if (selected === correct) {
+                score += 10;
+                document.getElementById('score').innerText = score;
+                btn.style.boxShadow = 'inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff, 0 0 0 4px #2dd4bf';
+            } else {
+                btn.style.boxShadow = 'inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff, 0 0 0 4px #f87171';
+                document.querySelectorAll('#options-container button').forEach(b => {
+                    if (b.innerText === correct) b.style.boxShadow = 'inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff, 0 0 0 4px #2dd4bf';
+                });
+            }
+            setTimeout(() => { currentQuestionIndex++; loadQuestion(); }, 1500);
+        }
+
+        function resetTimer() {
+            timeLeft = 15;
+            const bar = document.getElementById('timer-bar');
+            bar.style.transition = 'none';
+            bar.style.width = '100%';
+            setTimeout(() => bar.style.transition = 'width 1s linear', 50);
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                bar.style.width = `${(timeLeft / 15) * 100}%`;
+                if (timeLeft <= 0) { clearInterval(timer); currentQuestionIndex++; loadQuestion(); }
+            }, 1000);
+        }
+
+        async function endQuiz() {
+            if (currentUser) {
+                await fetch(`${API_URL}/api/score`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUser.email, score })
+                });
+            }
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-score-container').style.display = 'block';
+            document.getElementById('leaderboard-title').innerText = 'Quiz Complete!';
+            document.getElementById('leaderboard-buttons').querySelector('button[onclick*="category-screen"]').style.display = 'block';
+            await populateLeaderboard();
+            showScreen('leaderboard-screen');
+        }
+
+        async function showDashboard() {
+            document.getElementById('final-score-container').style.display = 'none';
+            document.getElementById('leaderboard-title').innerText = 'Dashboard';
+            document.getElementById('leaderboard-buttons').querySelector('button[onclick*="category-screen"]').style.display = currentUser ? 'block' : 'none';
+            await populateLeaderboard();
+            showScreen('leaderboard-screen');
+        }
+
+        async function populateLeaderboard() {
+            try {
+                const res = await fetch(`${API_URL}/api/leaderboard`);
+                const users = await res.json();
+                const list = document.getElementById('leaderboard-list');
+                list.innerHTML = users.map((p, i) => {
+                    const isYou = currentUser && p.email === currentUser.email;
+                    return `<div class="flex justify-between items-center p-3 rounded-xl ${isYou ? 'bg-cyan-100' : ''}">
+                        <div class="flex items-center">
+                            <span class="font-bold text-gray-600 w-8">${i + 1}.</span>
+                            <span class="${isYou ? 'font-bold text-cyan-700' : 'text-gray-700'}">${p.name} ${isYou ? '(You)' : ''}</span>
+                        </div>
+                        <span class="font-bold ${isYou ? 'text-cyan-700' : 'text-gray-600'}">${p.score}</span>
+                    </div>`;
+                }).join('');
+            } catch(err) { showMessage("Could not load leaderboard."); }
+        }
+        
+        showScreen('landing-screen');
+    </script>
+</body>
+</html>
+
