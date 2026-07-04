@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChalkQuiz — Quiz Performance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <!-- FIX: script moved to defer so the DOM exists before index.js runs.
+         Previously this was a plain <script> in <head>, which executed before
+         <body> was parsed, so document.querySelectorAll('.screen') returned
+         nothing and the app never initialized correctly. -->
+    <script src="index.js" defer></script>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-6">
+    <!-- Custom Message Box -->
+    <div id="message-box"></div>
+
+    <div id="app-container" class="w-full max-w-5xl mx-auto">
+
+        <!-- Landing Screen -->
+        <div id="landing-screen" class="screen active">
+        <div class="chalk-panel p-6 md:p-10">
+            <header class="flex justify-between items-center mb-10 md:mb-16">
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background: var(--chalk-yellow);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#21301F">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold font-display">ChalkQuiz</span>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium" style="color: var(--chalk-muted);">
+                <a href="#" class="hover:opacity-100" style="transition:color .15s" onmouseover="this.style.color='var(--chalk-yellow)'" onmouseout="this.style.color=''">Home</a>
+                <a href="#" onclick="showDashboard()" onmouseover="this.style.color='var(--chalk-yellow)'" onmouseout="this.style.color=''">Dashboard</a>
+                <a href="#" onmouseover="this.style.color='var(--chalk-yellow)'" onmouseout="this.style.color=''">About</a>
+                <a href="#" onmouseover="this.style.color='var(--chalk-yellow)'" onmouseout="this.style.color=''">Contact</a>
+            </nav>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+            <div class="text-center md:text-left">
+                <p class="font-hand text-2xl mb-1" style="color: var(--chalk-yellow);">Pop quiz —</p>
+                <h1 class="text-4xl lg:text-5xl font-bold font-display leading-tight">
+                    Quiz Performance<br/>System
+                </h1>
+                <p class="mt-4 max-w-md mx-auto md:mx-0" style="color: var(--chalk-muted);">
+                    A transparent and auditable system to evaluate and reward your knowledge.
+                </p>
+                <button onclick="showScreen('login-screen')" class="mt-8 px-10 py-3 chalk-btn chalk-btn-primary rounded-lg font-bold text-base">
+                    Get Started
+                </button>
+                <div class="mt-12">
+                    <hr class="chalk-divider mb-4"/>
+                    <h3 class="font-bold font-display">How it works</h3>
+                    <p class="mt-1 text-sm" style="color: var(--chalk-muted);">
+                        Pick a category, answer against the clock, and see exactly how your score breaks down.
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-full max-w-sm mx-auto">
+                <div class="relative flex justify-center mb-4">
+                <svg width="250" height="125" viewBox="0 0 250 125">
+                    <defs>
+                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#E8735A" />
+                            <stop offset="50%" stop-color="#F4C95D" />
+                            <stop offset="100%" stop-color="#6FBFB0" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M 25 115 A 100 100 0 0 1 225 115" fill="none" stroke="rgba(244,241,232,0.15)" stroke-width="20" stroke-linecap="round" stroke-dasharray="4 7"/>
+                    <path d="M 25 115 A 100 100 0 0 1 225 115" fill="none" stroke="url(#scoreGradient)" stroke-width="20" stroke-dasharray="314" stroke-dashoffset="87" stroke-linecap="round"/>
+                </svg>
+                <div class="absolute bottom-[-10px] text-center">
+                    <span class="text-5xl font-bold font-mono">72.3</span>
+                    <span class="text-lg font-medium" style="color: var(--chalk-muted);">/100</span>
+                </div>
+                </div>
+                <p class="text-center font-hand text-2xl mb-6" style="color: var(--chalk-yellow);">Your score</p>
+
+                <div>
+                    <h3 class="font-bold font-display mb-4 text-center md:text-left">Score Breakdown</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium" style="color: var(--chalk-muted);">Reasoning</span>
+                                <span class="font-bold font-mono">24</span>
+                            </div>
+                            <div class="w-full rounded-full h-2" style="background: rgba(0,0,0,0.25);">
+                                <div class="h-2 rounded-full" style="width: 80%; background: var(--chalk-teal);"></div>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium" style="color: var(--chalk-muted);">Quantitative</span>
+                                <span class="font-bold font-mono">21.25</span>
+                            </div>
+                            <div class="w-full rounded-full h-2" style="background: rgba(0,0,0,0.25);">
+                                <div class="h-2 rounded-full" style="width: 75%; background: var(--chalk-teal);"></div>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium" style="color: var(--chalk-muted);">History</span>
+                                <span class="font-bold font-mono">10</span>
+                            </div>
+                            <div class="w-full rounded-full h-2" style="background: rgba(0,0,0,0.25);">
+                                <div class="h-2 rounded-full" style="width: 50%; background: var(--chalk-yellow);"></div>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium" style="color: var(--chalk-muted);">G.K.</span>
+                                <span class="font-bold font-mono">17.3</span>
+                            </div>
+                            <div class="w-full rounded-full h-2" style="background: rgba(0,0,0,0.25);">
+                                <div class="h-2 rounded-full" style="width: 65%; background: var(--chalk-coral);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen max-w-md mx-auto">
+        <div class="chalk-panel p-8 text-center">
+            <p class="font-hand text-2xl mb-1" style="color: var(--chalk-yellow);">Welcome back —</p>
+            <h1 class="text-3xl font-bold font-display mb-2">Sign in</h1>
+            <p class="mb-8" style="color: var(--chalk-muted);">Continue your streak where you left off</p>
+            <div class="space-y-4">
+                <input id="login-email" type="email" placeholder="Email" class="w-full p-4 input-chalk focus:outline-none" autocomplete="email"/>
+                <input id="login-password" type="password" placeholder="Password" class="w-full p-4 input-chalk focus:outline-none" autocomplete="current-password"/>
+            </div>
+            <button onclick="handleLogin()" class="w-full mt-8 py-4 chalk-btn chalk-btn-primary rounded-xl font-bold">
+                LOG IN
+            </button>
+            <p class="mt-6 text-sm" style="color: var(--chalk-muted);">
+                Don't have an account?
+                <a href="#" onclick="showScreen('signup-screen')" class="font-semibold" style="color: var(--chalk-teal);">Sign up</a>
+            </p>
+            <p class="mt-4 text-sm">
+                <a href="#" onclick="showScreen('landing-screen')" class="font-semibold" style="color: var(--chalk-muted);">← Back to home</a>
+            </p>
+        </div>
+        </div>
+
+        <!-- Signup Screen -->
+        <div id="signup-screen" class="screen max-w-md mx-auto">
+        <div class="chalk-panel p-8 text-center">
+            <p class="font-hand text-2xl mb-1" style="color: var(--chalk-yellow);">First day —</p>
+            <h1 class="text-3xl font-bold font-display mb-2">Create your account</h1>
+            <p class="mb-8" style="color: var(--chalk-muted);">Let's get you on the board</p>
+            <div class="space-y-4">
+                <input id="signup-name" type="text" placeholder="Full name" class="w-full p-4 input-chalk focus:outline-none" autocomplete="name"/>
+                <input id="signup-email" type="email" placeholder="Email" class="w-full p-4 input-chalk focus:outline-none" autocomplete="email"/>
+                <input id="signup-password" type="password" placeholder="Password (min. 6 characters)" class="w-full p-4 input-chalk focus:outline-none" autocomplete="new-password"/>
+            </div>
+            <button onclick="handleSignup()" class="w-full mt-8 py-4 chalk-btn chalk-btn-primary rounded-xl font-bold">
+                SIGN UP
+            </button>
+            <p class="mt-6 text-sm" style="color: var(--chalk-muted);">
+                Already have an account?
+                <a href="#" onclick="showScreen('login-screen')" class="font-semibold" style="color: var(--chalk-teal);">Log in</a>
+            </p>
+            <p class="mt-4 text-sm">
+                <a href="#" onclick="showScreen('landing-screen')" class="font-semibold" style="color: var(--chalk-muted);">← Back to home</a>
+            </p>
+        </div>
+        </div>
+
+        <!-- Category Selection Screen -->
+        <div id="category-screen" class="screen max-w-lg mx-auto">
+        <div class="chalk-panel p-6">
+            <h2 class="text-2xl font-bold font-display text-center mb-1">Choose a category</h2>
+            <p class="text-center mb-6 font-hand text-xl" style="color: var(--chalk-yellow);" id="welcome-message"></p>
+            <div class="grid grid-cols-2 gap-4">
+                <div onclick="startQuiz('Reasoning')" class="category-card p-4 text-center rounded-2xl">
+                    <div class="text-4xl mb-2">🧠</div>
+                    <p class="font-semibold">Reasoning</p>
+                </div>
+                <div onclick="startQuiz('Quantitative Aptitude')" class="category-card p-4 text-center rounded-2xl">
+                    <div class="text-4xl mb-2">🧮</div>
+                    <p class="font-semibold">Quantitative</p>
+                </div>
+                <div onclick="startQuiz('Relations')" class="category-card p-4 text-center rounded-2xl">
+                    <div class="text-4xl mb-2">🤝</div>
+                    <p class="font-semibold">Relations</p>
+                </div>
+                <div onclick="startQuiz('General Knowledge')" class="category-card p-4 text-center rounded-2xl">
+                    <div class="text-4xl mb-2">🌍</div>
+                    <p class="font-semibold">G.K.</p>
+                </div>
+                <div onclick="startQuiz('History')" class="category-card p-4 text-center rounded-2xl">
+                    <div class="text-4xl mb-2">📜</div>
+                    <p class="font-semibold">History</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full mt-6 py-3 chalk-btn chalk-btn-outline rounded-xl font-bold">
+                Log out
+            </button>
+        </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen max-w-lg mx-auto">
+        <div class="chalk-panel p-6 space-y-6">
+            <div class="flex justify-between items-center text-sm font-mono">
+                <div style="color: var(--chalk-muted);">Q <span id="current-question" class="text-white">1</span>/<span id="total-questions">10</span></div>
+                <div class="text-lg font-bold font-display" id="quiz-category" style="color: var(--chalk-yellow);">Reasoning</div>
+                <div style="color: var(--chalk-muted);">Score: <span id="score" class="text-white">0</span></div>
+            </div>
+            <div class="w-full chalk-inset rounded-full h-3 overflow-hidden">
+                <div id="timer-bar" class="timer-bar-inner h-full rounded-full" style="width: 100%"></div>
+            </div>
+            <div class="chalk-inset p-6 rounded-2xl min-h-[120px] flex items-center justify-center">
+                <p id="question-text" class="text-center text-lg font-medium"></p>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+        </div>
+        </div>
+
+        <!-- Leaderboard/Score Screen -->
+        <div id="leaderboard-screen" class="screen max-w-lg mx-auto">
+        <div class="chalk-panel p-6 text-center">
+            <h1 id="leaderboard-title" class="text-3xl font-bold font-display mb-2">Quiz complete!</h1>
+            <div id="final-score-container">
+                <p class="mb-4 font-hand text-xl" style="color: var(--chalk-yellow);">Your final score is</p>
+                <div class="w-32 h-32 chalk-inset rounded-full mx-auto flex items-center justify-center mb-6">
+                    <span id="final-score" class="text-4xl font-bold font-mono" style="color: var(--chalk-teal);">0</span>
+                </div>
+            </div>
+            <hr class="chalk-divider mb-4"/>
+            <h2 class="text-xl font-bold font-display mb-4">Leaderboard</h2>
+            <div id="leaderboard-list" class="space-y-3 text-left max-h-60 overflow-y-auto pr-2"></div>
+            <div id="leaderboard-buttons" class="mt-8 space-y-3">
+                <button onclick="showScreen('category-screen')" class="w-full py-4 chalk-btn chalk-btn-primary rounded-xl font-bold">
+                    Play again
+                </button>
+                <button onclick="showScreen('landing-screen')" class="w-full py-3 chalk-btn chalk-btn-outline rounded-xl font-bold">
+                    Back to home
+                </button>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>
